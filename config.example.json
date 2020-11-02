@@ -12,6 +12,8 @@
     "condenser_api.get_ops_in_block": "hived",
     "condenser_api.get_witness_by_account": "hived",
 
+    "database_api.list_comments": "hivemind",
+    "database_api.find_comments": "hivemind",
     "condenser_api.get_account_reputations": "hivemind",
     "condenser_api.get_active_votes": "hivemind",
     "condenser_api.get_account_votes": "hivemind",
@@ -31,8 +33,6 @@
     "condenser_api.get_discussions_by_author_before_date": "hivemind",
     "condenser_api.get_state": "hivemind",
     "condenser_api.get_trending_tags": "hivemind",
-    "database_api.list_comments": "hivemind",
-    "database_api.find_comments": "hivemind",
     "condenser_api.get_post_discussions_by_payout": "hivemind",
     "condenser_api.get_comment_discussions_by_payout": "hivemind",
     "condenser_api.get_content_replies": "hivemind",
