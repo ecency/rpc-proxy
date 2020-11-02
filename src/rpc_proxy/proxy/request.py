@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 
 from flask import request
 
@@ -18,20 +19,25 @@ class RpcRequest:
         )
 
 
-def get_request() -> RpcRequest:
-    # Todo: validate input, make sure data.
+def get_request() -> Optional[RpcRequest]:
     data = request.get_data().decode()
 
     return parse_request(data)
 
 
-def parse_request(data: str) -> RpcRequest:
-    js_data = json.loads(data)
+def parse_request(data: str) -> Optional[RpcRequest]:
+    try:
+        js_data = json.loads(data)
+    except json.decoder.JSONDecodeError:
+        return None
 
-    rpc_ver = js_data["jsonrpc"]
-    raw_method = js_data["method"]
-    params = js_data["params"] if "params" in js_data else []
-    _id = js_data["id"]
+    if "jsonrpc" in js_data and "method" in js_data and "id" in js_data:
+        rpc_ver = js_data["jsonrpc"]
+        raw_method = js_data["method"]
+        params = js_data["params"] if "params" in js_data else []
+        _id = js_data["id"]
+    else:
+        return None
 
     if raw_method == "call":
         [api, method, params] = params

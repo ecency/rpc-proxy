@@ -3,7 +3,7 @@ from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from rpc_proxy.logger import create_logger
-from rpc_proxy.proxy.handler import handler
+from rpc_proxy.proxy.tunnel import tunnel
 
 app = None
 
@@ -20,7 +20,7 @@ def __flask_setup():
 
     @app.route("/", methods=["POST"])
     def index():
-        return handler()
+        return tunnel()
 
 
 def __run_dev_server():
