@@ -1,6 +1,6 @@
 # RPC-PROXY
 
-Installation notes for ubuntu.
+Installation instructions for Linux(Ubuntu).
 
 ### Clone
 `$ git clone https://github.com/ecency/rpc-proxy`
