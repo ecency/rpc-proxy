@@ -1,0 +1,30 @@
+#!/bin/bash
+
+PWD_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+BASE_DIR="$PWD_DIR/.."
+SRC_DIR="$PWD_DIR/../src"
+VENVDIR="$PWD_DIR/../venv"
+
+source "${BASE_DIR}/env.sh"
+
+cd $VENVDIR
+source bin/activate
+
+export PYTHONPATH=$SRC_DIR
+
+cd "$SRC_DIR/rpc_proxy/proxy"
+
+NAME="api"
+SOCKFILE="$BASE_DIR/rpc-proxy.sock"
+
+# Create the run directory if it doesn't exist
+RUNDIR=$(dirname $SOCKFILE)
+test -d $RUNDIR || mkdir -p $RUNDIR
+
+# Start your unicorn
+exec gunicorn app:app --chdir '../../'  -b $WSGI_BIND \
+  --name $NAME \
+  --workers $WSGI_WORKERS \
+  --timeout $WSGI_TIMEOUT \
+  --bind=unix:$SOCKFILE

@@ -3,5 +3,7 @@ venv
 *.pyc
 .DS_Store
 log/
-
+.sock
+.log
+env.sh
 config.json
