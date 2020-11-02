@@ -4,7 +4,42 @@
     "hivemind": "http://127.0.0.1:8080"
   },
   "endpoints": {
-    "bridge.get_post": "hivemind",
-    "database_api.get_dynamic_global_properties": "hived"
+    "database_api": "hived",
+    "database_api.get_dynamic_global_properties": "hived",
+    "condenser_api.get_dynamic_global_properties": "hived",
+    "condenser_api.get_account_history": "hived",
+    "condenser_api.get_transaction": "hived",
+    "condenser_api.get_ops_in_block": "hived",
+    "condenser_api.get_witness_by_account": "hived",
+
+    "condenser_api.get_account_reputations": "hivemind",
+    "condenser_api.get_active_votes": "hivemind",
+    "condenser_api.get_account_votes": "hivemind",
+    "condenser_api.get_followers": "hivemind",
+    "condenser_api.get_following": "hivemind",
+    "condenser_api.get_follow_count": "hivemind",
+    "condenser_api.get_blog": "hivemind",
+    "condenser_api.get_content": "hivemind",
+    "condenser_api.get_blog_entries": "hivemind",
+    "condenser_api.get_discussions_by_trending": "hivemind",
+    "condenser_api.get_discussions_by_hot": "hivemind",
+    "condenser_api.get_discussions_by_promoted": "hivemind",
+    "condenser_api.get_discussions_by_created": "hivemind",
+    "condenser_api.get_discussions_by_blog": "hivemind",
+    "condenser_api.get_discussions_by_feed": "hivemind",
+    "condenser_api.get_discussions_by_comments": "hivemind",
+    "condenser_api.get_discussions_by_author_before_date": "hivemind",
+    "condenser_api.get_state": "hivemind",
+    "condenser_api.get_trending_tags": "hivemind",
+    "database_api.list_comments": "hivemind",
+    "database_api.find_comments": "hivemind",
+    "condenser_api.get_post_discussions_by_payout": "hivemind",
+    "condenser_api.get_comment_discussions_by_payout": "hivemind",
+    "condenser_api.get_content_replies": "hivemind",
+    "condenser_api.get_replies_by_last_update": "hivemind",
+
+    "follow_api": "hivemind",
+    "tags_api": "hivemind",
+    "bridge": "hivemind"
   }
 }
