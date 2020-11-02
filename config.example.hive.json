@@ -1,7 +1,8 @@
 {
   "instances": {
-    "hived": "http://127.0.0.1:8091",
-    "hivemind": "http://127.0.0.1:8080"
+    "hived": "ws://127.0.0.1:8090",
+    "hivemind": "http://127.0.0.1:8080",
+    "test": "/tmp/hived.socket"
   },
   "endpoints": {
     "database_api": "hived",
