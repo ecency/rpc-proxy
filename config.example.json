@@ -1,0 +1,10 @@
+{
+  "instances": {
+    "hived": "http://127.0.0.1:8091",
+    "hivemind": "http://127.0.0.1:8080"
+  },
+  "endpoints": {
+    "bridge.get_post": "hivemind",
+    "database_api.get_dynamic_global_properties": "hived"
+  }
+}

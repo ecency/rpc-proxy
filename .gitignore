@@ -1,0 +1,7 @@
+venv
+.idea
+*.pyc
+.DS_Store
+log/
+
+config.json
