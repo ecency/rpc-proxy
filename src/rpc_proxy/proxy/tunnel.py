@@ -41,10 +41,10 @@ def tunnel():
     if re.match("^(http|https)://", instance):
         resp = http_tunnel(instance, request)
     elif re.match("^(ws|wss)://", instance):
-        return ws_tunnel(instance, request)
+        resp = ws_tunnel(instance, request)
     elif instance.startswith("sock://"):
-        return sock_tunnel(instance, request)
+        resp = sock_tunnel(instance, request)
     else:
-        return {"error": "Not a valid scheme"}, 406
+        return {"error": "Not a valid scheme: {}".format(instance)}, 406
 
     return jsonify(resp)
