@@ -16,9 +16,9 @@ def init_sockets():
     global _ws
 
     _ws = {}
-    instances: Dict[str, str] = config_get("instances")
-    for k in instances.keys():
-        address = instances[k]
+    targets: Dict[str, str] = config_get("targets")
+    for k in targets.keys():
+        address = targets[k]
         if re.match(WS_RE, address):
             try:
                 sock = create_connection(address, timeout=config_get_timeout(k))

@@ -52,26 +52,28 @@ def tunnel():
     if route is None:
         return {"error": "No route has matched: '{}'".format(path)}, 406
 
-    instance_name = config_get("routes", route)
+    target_name = config_get("routes", route)
 
     try:
-        instance: str = config_get("instances", instance_name)
+        target: str = config_get("targets", target_name)
     except NoSuchConfigException:
-        return {"error": "Not a valid instance: {}".format(instance_name)}, 406
+        return {"error": "Not a valid target: {}".format(target_name)}, 406
 
-    timeout = config_get_timeout(instance_name)
+    should_cache = route_match(config_get("no-cache"), path) is None
 
-    if re.match(HTTP_RE, instance):
+    timeout = config_get_timeout(target_name)
+
+    if re.match(HTTP_RE, target):
         fn = http_tunnel
-    elif re.match(WS_RE, instance):
+    elif re.match(WS_RE, target):
         fn = ws_tunnel
-    elif re.match(SOCK_RE, instance):
+    elif re.match(SOCK_RE, target):
         fn = sock_tunnel
     else:
-        return {"error": "Not a valid scheme: {}".format(instance)}, 406
+        return {"error": "Not a valid scheme: {}".format(target)}, 406
 
     try:
-        resp = fn(*(instance, request, timeout))
+        resp = fn(*(target, request, timeout))
     except BaseException as ex:
         return {"error": str(ex)}
 
