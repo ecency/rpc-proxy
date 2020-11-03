@@ -1,6 +1,6 @@
 import unittest
 
-from rpc_proxy.proxy.request import parse_request
+from rpc_proxy.request import parse_request
 
 
 class ProxyTestCase(unittest.TestCase):

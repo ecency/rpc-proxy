@@ -6,6 +6,7 @@ import requests
 from flask import jsonify
 
 from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigException
+from rpc_proxy.helper import route_match
 from rpc_proxy.regex import *
 from rpc_proxy.request import get_request, RpcRequest
 from rpc_proxy.ws import get_socket
@@ -46,14 +47,9 @@ def tunnel():
 
     path = "{}.{}".format(request.api, request.method)
 
-    routes = config_get("routes")
+    route = route_match(config_get("routes"), path)
 
-    match = [x for x in routes if re.compile(x).match(path)]
-
-    if len(match) == 0:
-        return {"error": "No route has matched: '{}'".format(path)}, 406
-
-    instance_name = config_get("routes", match[0])
+    instance_name = config_get("routes", route)
 
     try:
         instance: str = config_get("instances", instance_name)
