@@ -9,7 +9,6 @@ from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigExcepti
 from rpc_proxy.regex import *
 from rpc_proxy.request import get_request, RpcRequest
 from rpc_proxy.ws import get_socket
-import re
 
 
 class Response:
