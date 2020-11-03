@@ -4,19 +4,26 @@ import re
 
 from rpc_proxy.config import config_get
 from rpc_proxy.proxy.request import get_request, RpcRequest
+from typing import Optional, Dict
 
 
-def http_tunnel(url: str, request: RpcRequest) -> dict:
+class Response:
+    def __init__(self, status: bool, json: Optional[Dict] = None):
+        self.status = status
+        self.json = json
+
+
+def http_tunnel(url: str, request: RpcRequest) -> Response:
     resp = requests.post(url, request.data)
 
-    return resp.json()
+    return Response(True, resp.json())
 
 
-def ws_tunnel(url: str, request: RpcRequest) -> dict:
+def ws_tunnel(url: str, request: RpcRequest) -> Response:
     raise NotImplementedError
 
 
-def sock_tunnel(url: str, request: RpcRequest) -> dict:
+def sock_tunnel(url: str, request: RpcRequest) -> Response:
     raise NotImplementedError
 
 
@@ -47,4 +54,4 @@ def tunnel():
     else:
         return {"error": "Not a valid scheme: {}".format(instance)}, 406
 
-    return jsonify(resp)
+    return jsonify(resp.json)
