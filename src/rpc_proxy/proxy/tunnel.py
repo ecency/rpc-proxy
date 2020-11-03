@@ -1,16 +1,20 @@
+import json
+import re
+from typing import Optional, Dict
+
 import requests
 from flask import jsonify
-import re
 
 from rpc_proxy.config import config_get
 from rpc_proxy.proxy.request import get_request, RpcRequest
-from typing import Optional, Dict
+from rpc_proxy.proxy.ws import get_socket
+from rpc_proxy.regex import *
 
 
 class Response:
-    def __init__(self, status: bool, json: Optional[Dict] = None):
+    def __init__(self, status: bool, data: Optional[Dict] = None):
         self.status = status
-        self.json = json
+        self.data = data
 
 
 def http_tunnel(url: str, request: RpcRequest) -> Response:
@@ -20,7 +24,13 @@ def http_tunnel(url: str, request: RpcRequest) -> Response:
 
 
 def ws_tunnel(url: str, request: RpcRequest) -> Response:
-    raise NotImplementedError
+    sock = get_socket(url)
+    sock.send(request.data)
+    resp = sock.recv()
+
+    data = json.loads(resp)
+
+    return Response(True, data)
 
 
 def sock_tunnel(url: str, request: RpcRequest) -> Response:
@@ -45,13 +55,13 @@ def tunnel():
     except KeyError:
         return {"error": "Not a valid instance: {}".format(endpoint_target)}, 406
 
-    if re.match("^(http|https)://", instance):
+    if re.match(HTTP_RE, instance):
         resp = http_tunnel(instance, request)
-    elif re.match("^(ws|wss)://", instance):
+    elif re.match(WS_RE, instance):
         resp = ws_tunnel(instance, request)
-    elif instance.startswith("sock://"):
+    elif re.match(SOCK_RE, instance):
         resp = sock_tunnel(instance, request)
     else:
         return {"error": "Not a valid scheme: {}".format(instance)}, 406
 
-    return jsonify(resp.json)
+    return jsonify(resp.data)
