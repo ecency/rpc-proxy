@@ -10,12 +10,7 @@ from rpc_proxy.helper import route_match
 from rpc_proxy.regex import *
 from rpc_proxy.request import get_request, RpcRequest
 from rpc_proxy.ws import get_socket
-
-
-class Response:
-    def __init__(self, status: bool, data: Optional[Dict] = None):
-        self.status = status
-        self.data = data
+from rpc_proxy.cache import cache
 
 
 def http_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
@@ -52,14 +47,25 @@ def tunnel():
     if route is None:
         return {"error": "No route has matched: '{}'".format(path)}, 406
 
-    target_name = config_get("routes", route)
+    route_config = config_get("routes", route)
+
+    target_name = route_config["target"]
 
     try:
         target: str = config_get("targets", target_name)
     except NoSuchConfigException:
         return {"error": "Not a valid target: {}".format(target_name)}, 406
 
-    should_cache = route_match(config_get("no-cache"), path) is None
+    cache_timeout: int = config_get("default-cache")
+    if "cache" in route_config:
+        cache_timeout = route_config["cache"]
+
+    cache_key = "{}_{}".format(path, hash(str(request.params)))
+
+    if cache_timeout > 0:
+        resp = cache.get(cache_key)
+        if resp is not None:
+            return resp
 
     timeout = config_get_timeout(target_name)
 
@@ -76,5 +82,8 @@ def tunnel():
         resp = fn(*(target, request, timeout))
     except BaseException as ex:
         return {"error": str(ex)}
+
+    if cache_timeout > 0:
+        cache.set(cache_key, resp, timeout=cache_timeout)
 
     return jsonify(resp)
