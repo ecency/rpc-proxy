@@ -6,13 +6,13 @@ from websocket import create_connection, WebSocket, WebSocketException
 from rpc_proxy.config import config_get
 from rpc_proxy.regex import *
 
-WS: Optional[Dict[str, WebSocket]] = None
+_ws: Optional[Dict[str, WebSocket]] = None
 
 
 def init_sockets():
-    global WS
+    global _ws
 
-    WS = {}
+    _ws = {}
     instances: Dict[str, str] = config_get("instances")
     for address in instances.values():
         if re.match(WS_RE, address):
@@ -23,14 +23,14 @@ def init_sockets():
             except WebSocketException:
                 raise Exception("Web socket connection could not be created: {}".format(address))
 
-            WS[address] = sock
+            _ws[address] = sock
 
 
 def get_socket(address: str) -> Optional[WebSocket]:
-    if WS is None:
+    if _ws is None:
         init_sockets()
 
-    if address in WS:
-        return WS[address]
+    if address in _ws:
+        return _ws[address]
 
     return None

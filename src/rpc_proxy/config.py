@@ -2,13 +2,11 @@ import functools
 import json
 import operator
 import os
+from typing import Dict, Optional
 
-from rpc_proxy.logger import create_logger
 from rpc_proxy.util import file_read
 
-logger = create_logger('config')
-
-_config = None
+_config: Optional[Dict] = None
 
 
 def init_config():
