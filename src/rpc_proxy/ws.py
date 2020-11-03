@@ -12,11 +12,21 @@ _ws: Optional[Dict[str, WebSocket]] = None
 def init_sockets():
     global _ws
 
+    timeouts = config_get("timeouts")
+
     _ws = {}
     instances: Dict[str, str] = config_get("instances")
-    for address in instances.values():
+    for k in instances.keys():
+        address = instances[k]
         if re.match(WS_RE, address):
-            sock = create_connection(address, timeout=0.5)
+
+            if isinstance(timeouts, int):
+                timeout = timeouts
+            else:
+                timeout = config_get("timeouts", k)
+
+            sock = create_connection(address, timeout=timeout)
+
             try:
                 sock.send("test")
                 sock.recv()

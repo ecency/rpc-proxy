@@ -9,6 +9,10 @@ from rpc_proxy.util import file_read
 _config: Optional[Dict] = None
 
 
+class NoSuchConfigException(BaseException):
+    pass
+
+
 def init_config():
     global _config
 
@@ -26,4 +30,8 @@ def config_get(*args):
     if _config is None:
         init_config()
 
-    return functools.reduce(operator.getitem, args, _config)
+    try:
+        return functools.reduce(operator.getitem, args, _config)
+    except KeyError:
+        j_args = ".".join(args)
+        raise NoSuchConfigException("No such config: {}".format(j_args))
