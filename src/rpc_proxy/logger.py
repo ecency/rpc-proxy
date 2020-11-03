@@ -3,13 +3,13 @@ import os
 from logging.handlers import RotatingFileHandler
 
 log_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'log'))
-log_path = os.path.join(log_dir, 'hive-proxy.log')
+log_path = os.path.join(log_dir, 'rpc-proxy.log')
 
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
 
-def create_logger(name, level=logging.INFO):
+def create_logger(name, level=logging.INFO) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
