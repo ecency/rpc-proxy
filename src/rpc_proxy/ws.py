@@ -1,10 +1,13 @@
 import re
 from typing import Dict, Optional
 
-from websocket import create_connection, WebSocket, WebSocketException
+from websocket import create_connection, WebSocket
 
-from rpc_proxy.config import config_get
+from rpc_proxy.config import config_get, config_get_timeout
+from rpc_proxy.logger import create_logger
 from rpc_proxy.regex import *
+
+logger = create_logger("ws")
 
 _ws: Optional[Dict[str, WebSocket]] = None
 
@@ -12,26 +15,17 @@ _ws: Optional[Dict[str, WebSocket]] = None
 def init_sockets():
     global _ws
 
-    timeouts = config_get("timeouts")
-
     _ws = {}
     instances: Dict[str, str] = config_get("instances")
     for k in instances.keys():
         address = instances[k]
         if re.match(WS_RE, address):
-
-            if isinstance(timeouts, int):
-                timeout = timeouts
-            else:
-                timeout = config_get("timeouts", k)
-
-            sock = create_connection(address, timeout=timeout)
-
             try:
-                sock.send("test")
-                sock.recv()
-            except WebSocketException:
-                raise Exception("Web socket connection could not be created: {}".format(address))
+                sock = create_connection(address, timeout=config_get_timeout(k))
+            except BaseException as ex:
+                msg = "Web socket connection could not be created: {} - {}".format(address, str(ex))
+                logger.error(msg)
+                raise Exception(msg)
 
             _ws[address] = sock
 

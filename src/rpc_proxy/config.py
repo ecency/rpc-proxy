@@ -35,3 +35,12 @@ def config_get(*args):
     except KeyError:
         j_args = ".".join(args)
         raise NoSuchConfigException("No such config: {}".format(j_args))
+
+
+def config_get_timeout(instance_name: str):
+    timeouts = config_get("timeouts")
+
+    if isinstance(timeouts, int):
+        return timeouts
+    else:
+        return config_get("timeouts", instance_name)

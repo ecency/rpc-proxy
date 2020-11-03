@@ -5,10 +5,10 @@ from typing import Optional, Dict
 import requests
 from flask import jsonify
 
-from rpc_proxy.config import config_get
+from rpc_proxy.config import config_get, config_get_timeout
+from rpc_proxy.regex import *
 from rpc_proxy.request import get_request, RpcRequest
 from rpc_proxy.ws import get_socket
-from rpc_proxy.regex import *
 
 
 class Response:
@@ -17,23 +17,24 @@ class Response:
         self.data = data
 
 
-def http_tunnel(url: str, request: RpcRequest) -> Response:
-    resp = requests.post(url, request.data)
+def http_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
+    resp = requests.post(url, request.data, timeout=timeout)
 
-    return Response(True, resp.json())
+    return resp.json()
 
 
-def ws_tunnel(url: str, request: RpcRequest) -> Response:
+def ws_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
     sock = get_socket(url)
+
+    sock.settimeout(timeout)
+
     sock.send(request.data)
     resp = sock.recv()
 
-    data = json.loads(resp)
-
-    return Response(True, data)
+    return json.loads(resp)
 
 
-def sock_tunnel(url: str, request: RpcRequest) -> Response:
+def sock_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
     raise NotImplementedError
 
 
@@ -55,13 +56,20 @@ def tunnel():
     except KeyError:
         return {"error": "Not a valid instance: {}".format(endpoint_target)}, 406
 
+    timeout = config_get_timeout(endpoint_target)
+
     if re.match(HTTP_RE, instance):
-        resp = http_tunnel(instance, request)
+        fn = http_tunnel
     elif re.match(WS_RE, instance):
-        resp = ws_tunnel(instance, request)
+        fn = ws_tunnel
     elif re.match(SOCK_RE, instance):
-        resp = sock_tunnel(instance, request)
+        fn = sock_tunnel
     else:
         return {"error": "Not a valid scheme: {}".format(instance)}, 406
 
-    return jsonify(resp.data)
+    try:
+        resp = fn(*(instance, request, timeout))
+    except BaseException as ex:
+        return {"error": str(ex)}
+
+    return jsonify(resp)
