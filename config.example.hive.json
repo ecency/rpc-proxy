@@ -4,6 +4,11 @@
     "hivemind": "http://127.0.0.1:8080",
     "test": "/tmp/hived.socket"
   },
+  "timeouts": {
+    "hived": 0.5,
+    "hivemind": 1,
+    "test": 0.5
+  },
   "endpoints": {
     "database_api": "hived",
     "database_api.get_dynamic_global_properties": "hived",
@@ -12,7 +17,6 @@
     "condenser_api.get_transaction": "hived",
     "condenser_api.get_ops_in_block": "hived",
     "condenser_api.get_witness_by_account": "hived",
-
     "database_api.list_comments": "hivemind",
     "database_api.find_comments": "hivemind",
     "condenser_api.get_account_reputations": "hivemind",
@@ -38,7 +42,6 @@
     "condenser_api.get_comment_discussions_by_payout": "hivemind",
     "condenser_api.get_content_replies": "hivemind",
     "condenser_api.get_replies_by_last_update": "hivemind",
-
     "follow_api": "hivemind",
     "tags_api": "hivemind",
     "bridge": "hivemind"
