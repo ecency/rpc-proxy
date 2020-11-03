@@ -3,7 +3,7 @@ from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from rpc_proxy.logger import create_logger
-from rpc_proxy.proxy.tunnel import tunnel
+from rpc_proxy.tunnel import tunnel
 
 app = None
 

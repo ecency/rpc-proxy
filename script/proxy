@@ -13,7 +13,7 @@ source bin/activate
 
 export PYTHONPATH=$SRC_DIR
 
-cd "$SRC_DIR/rpc_proxy/proxy"
+cd "$SRC_DIR/rpc_proxy"
 
 NAME="api"
 SOCKFILE="$BASE_DIR/rpc-proxy.sock"

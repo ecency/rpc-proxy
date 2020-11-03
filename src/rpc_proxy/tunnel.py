@@ -6,8 +6,8 @@ import requests
 from flask import jsonify
 
 from rpc_proxy.config import config_get
-from rpc_proxy.proxy.request import get_request, RpcRequest
-from rpc_proxy.proxy.ws import get_socket
+from rpc_proxy.request import get_request, RpcRequest
+from rpc_proxy.ws import get_socket
 from rpc_proxy.regex import *
 
 

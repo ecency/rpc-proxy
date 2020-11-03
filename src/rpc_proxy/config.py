@@ -11,7 +11,7 @@ logger = create_logger('config')
 _config = None
 
 
-def make_config():
+def init_config():
     global _config
 
     this_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
@@ -24,8 +24,8 @@ def make_config():
     _config = json.loads(content)
 
 
-make_config()
-
-
 def config_get(*args):
+    if _config is None:
+        init_config()
+
     return functools.reduce(operator.getitem, args, _config)

@@ -23,7 +23,12 @@ def main():
     cmd = args.cmd
 
     if cmd == "proxy":
-        from rpc_proxy.proxy.app import main
+        from rpc_proxy.config import init_config
+        from rpc_proxy.ws import init_sockets
+        from rpc_proxy.app import main
+        init_config()
+        init_sockets()
+
         main()
 
     if cmd == "test":
