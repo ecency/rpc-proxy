@@ -23,7 +23,7 @@ Installation instructions for Linux(Ubuntu).
 `$ python run.py`
 
 ### Run in production mode
-`script/proxy` file starts wsgi app.
+`script/wsgi` file starts app in gunicorn wsgi container.
 
 #### Make your env.sh file
 
@@ -31,7 +31,7 @@ Tip for WSGI_WORKERS: **(cpu core count * 2) + 1**
 
 `$ cp env.sh.example env.sh`
 
-`$ script/proxy`
+`$ script/wsgi`
 
 ### Running wsgi app with Supervisor
 
@@ -43,7 +43,7 @@ Tip for WSGI_WORKERS: **(cpu core count * 2) + 1**
 
 ```
 [program:proxy]
-command=/path/to/script/proxy
+command=/path/to/script/wsgi
 directory=/root
 autostart=true
 autorestart=true
