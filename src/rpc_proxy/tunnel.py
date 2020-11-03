@@ -49,6 +49,9 @@ def tunnel():
 
     route = route_match(config_get("routes"), path)
 
+    if route is None:
+        return {"error": "No route has matched: '{}'".format(path)}, 406
+
     instance_name = config_get("routes", route)
 
     try:
