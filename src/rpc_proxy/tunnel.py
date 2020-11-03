@@ -5,10 +5,11 @@ from typing import Optional, Dict
 import requests
 from flask import jsonify
 
-from rpc_proxy.config import config_get, config_get_timeout
+from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigException
 from rpc_proxy.regex import *
 from rpc_proxy.request import get_request, RpcRequest
 from rpc_proxy.ws import get_socket
+import re
 
 
 class Response:
@@ -46,17 +47,21 @@ def tunnel():
 
     path = "{}.{}".format(request.api, request.method)
 
-    try:
-        endpoint_target = config_get("endpoints", path)
-    except KeyError:
-        return {"error": "Not a valid endpoint: {}".format(path)}, 406
+    routes = config_get("routes")
+
+    match = [x for x in routes if re.compile(x).match(path)]
+
+    if len(match) == 0:
+        return {"error": "No route has matched: '{}'".format(path)}, 406
+
+    instance_name = config_get("routes", match[0])
 
     try:
-        instance: str = config_get("instances", endpoint_target)
-    except KeyError:
-        return {"error": "Not a valid instance: {}".format(endpoint_target)}, 406
+        instance: str = config_get("instances", instance_name)
+    except NoSuchConfigException:
+        return {"error": "Not a valid instance: {}".format(instance_name)}, 406
 
-    timeout = config_get_timeout(endpoint_target)
+    timeout = config_get_timeout(instance_name)
 
     if re.match(HTTP_RE, instance):
         fn = http_tunnel
