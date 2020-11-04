@@ -1,16 +1,16 @@
 import json
 import re
-from typing import Optional, Dict
+from typing import Dict
 
 import requests
-from flask import jsonify
+from flask import Response
 
+from rpc_proxy.cache import cache
 from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigException
 from rpc_proxy.helper import route_match
 from rpc_proxy.regex import *
 from rpc_proxy.request import get_request, RpcRequest
 from rpc_proxy.ws import get_socket
-from rpc_proxy.cache import cache
 
 
 def http_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
@@ -32,6 +32,17 @@ def ws_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
 
 def sock_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
     raise NotImplementedError
+
+
+def make_response(data: str, from_cache: bool, source: str):
+    return Response(
+        response=data,
+        mimetype='application/json',
+        headers={
+            "rpc-proxy-from-cache": "1" if from_cache else "0",
+            "rpc-proxy-data-source": source
+        }
+    )
 
 
 def tunnel():
@@ -65,7 +76,7 @@ def tunnel():
     if cache_timeout > 0:
         resp = cache.get(cache_key)
         if resp is not None:
-            return resp
+            return make_response(json.dumps(resp), True, target_name)
 
     timeout = config_get_timeout(target_name)
 
@@ -83,7 +94,7 @@ def tunnel():
     except BaseException as ex:
         return {"error": str(ex)}
 
-    if cache_timeout > 0:
+    if "error" not in resp and cache_timeout > 0:
         cache.set(cache_key, resp, timeout=cache_timeout)
 
-    return jsonify(resp)
+    return make_response(json.dumps(resp), False, target_name)
