@@ -1,7 +1,7 @@
 {
   "targets": {
-    "hived": "ws://168.119.70.164:8090",
-    "hivemind": "http://168.119.70.164:8080"
+    "hived": "ws://127.0.0.1:8090",
+    "hivemind": "http://127.0.0.1:8080"
   },
   "timeouts": {
     "hived": 10,
