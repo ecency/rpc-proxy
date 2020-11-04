@@ -17,6 +17,14 @@ Installation instructions for Linux(Ubuntu).
 ### Make your config file
 `$ cp config.example.json config.json`
 
+### Make your env.sh file
+
+Tip for WSGI_WORKERS: **(cpu core count * 2) + 1**
+
+`$ cp env.sh.example env.sh`
+
+`$ source env.sh`
+
 ### Run in development mode
 `$ source venv/bin/activate`
 
@@ -24,12 +32,6 @@ Installation instructions for Linux(Ubuntu).
 
 ### Run in production mode
 `script/wsgi` file starts app in gunicorn wsgi container.
-
-#### Make your env.sh file
-
-Tip for WSGI_WORKERS: **(cpu core count * 2) + 1**
-
-`$ cp env.sh.example env.sh`
 
 `$ script/wsgi`
 
