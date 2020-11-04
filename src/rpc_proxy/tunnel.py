@@ -43,6 +43,7 @@ def make_response(data: str, from_cache: bool, source: str, path: str, route: st
             "rpc-proxy-data-source": source,
             "rpc-proxy-path": path,
             "rpc-proxy-route": route,
+            "Access-Control-Expose-Headers": "*"
         }
     )
 
