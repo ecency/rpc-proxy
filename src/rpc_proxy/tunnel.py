@@ -34,13 +34,15 @@ def sock_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
     raise NotImplementedError
 
 
-def make_response(data: str, from_cache: bool, source: str):
+def make_response(data: str, from_cache: bool, source: str, path: str, route: str):
     return Response(
         response=data,
         mimetype='application/json',
         headers={
             "rpc-proxy-from-cache": "1" if from_cache else "0",
-            "rpc-proxy-data-source": source
+            "rpc-proxy-data-source": source,
+            "rpc-proxy-path": path,
+            "rpc-proxy-route": route,
         }
     )
 
@@ -76,7 +78,7 @@ def tunnel():
     if cache_timeout > 0:
         resp = cache.get(cache_key)
         if resp is not None:
-            return make_response(json.dumps(resp), True, target_name)
+            return make_response(json.dumps(resp), True, target_name, path, route)
 
     timeout = config_get_timeout(target_name)
 
@@ -97,4 +99,4 @@ def tunnel():
     if "error" not in resp and cache_timeout > 0:
         cache.set(cache_key, resp, timeout=cache_timeout)
 
-    return make_response(json.dumps(resp), False, target_name)
+    return make_response(json.dumps(resp), False, target_name, path, route)
