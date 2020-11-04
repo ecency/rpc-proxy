@@ -15,7 +15,7 @@ Installation instructions for Linux(Ubuntu).
 `$ pip install -r requirements.txt`
 
 ### Make your config file
-`$ cp config.example.json config.json`
+`$ cp config.example.hive.json config.json`
 
 ### Make your env.sh file
 
