@@ -4,6 +4,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from rpc_proxy.logger import create_logger
 from rpc_proxy.tunnel import tunnel
+from rpc_proxy.util import assert_env_vars
 
 from rpc_proxy.cache import cache
 
@@ -19,7 +20,11 @@ def __flask_setup():
     app.wsgi_app = ProxyFix(app.wsgi_app)
     app.logger = app_logger
     CORS(app)
-    cache.init_app(app, config={"CACHE_TYPE": "simple", "CACHE_DEFAULT_TIMEOUT": 60})
+    cache.init_app(app, config={
+        "CACHE_TYPE": "redis",
+        "CACHE_THRESHOLD": assert_env_vars("CACHE_THRESHOLD"),
+        "CACHE_REDIS_URL": assert_env_vars("CACHE_REDIS_URL")
+    })
 
     @app.route("/", methods=["POST"])
     def index():
