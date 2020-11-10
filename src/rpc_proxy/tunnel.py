@@ -10,10 +10,17 @@ from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigExcepti
 from rpc_proxy.helper import route_match
 from rpc_proxy.logger import create_logger
 from rpc_proxy.regex import *
-from rpc_proxy.request import parse_request, RpcRequest
+from rpc_proxy.request import parse_request
+from rpc_proxy.util import assert_env_vars
 from rpc_proxy.ws import get_socket
 
 logger = create_logger("tunnel")
+
+try:
+    assert_env_vars("LOG_ERRORS")
+    LOG_ERRORS = True
+except AssertionError:
+    LOG_ERRORS = False
 
 
 async def http_tunnel(url: str, payload: str, timeout: int) -> Dict:
@@ -115,7 +122,7 @@ async def tunnel(data: Optional[Dict]):
     except BaseException as ex:
         return error_response({"error": str(ex)}, 500)
 
-    if "error" in resp:
+    if LOG_ERRORS and "error" in resp:
         logger.error("Query failed: {} - {}".format(request.data, json.dumps(resp)))
 
     if "error" not in resp and cache_timeout > 0:
