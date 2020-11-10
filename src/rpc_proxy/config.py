@@ -13,23 +13,19 @@ class NoSuchConfigException(BaseException):
     pass
 
 
-def init_config():
+def init_config(config_path):
     global _config
 
-    this_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+    if not os.path.isfile(config_path):
+        print("Config file not found at path: {}".format(config_path))
+        exit(1)
 
-    # Todo: Validate config
-    path = os.path.join(this_dir, "..", "..", "config.json")
-
-    content = file_read(path)
+    content = file_read(config_path)
 
     _config = json.loads(content)
 
 
 def config_get(*args):
-    if _config is None:
-        init_config()
-
     try:
         return functools.reduce(operator.getitem, args, _config)
     except KeyError:

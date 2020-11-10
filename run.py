@@ -1,7 +1,7 @@
 import argparse
+import logging
 import os
 import sys
-import logging
 
 logging.basicConfig(level=logging.INFO)
 
@@ -18,16 +18,23 @@ def main():
     )
 
     parser.add_argument("cmd", choices=cmd_list, nargs="?", default="proxy")
+    parser.add_argument("--config", dest="config")
 
     args = parser.parse_args()
     cmd = args.cmd
 
     if cmd == "proxy":
+        config = args.config
+
+        if config is None:
+            print("--config parameter required!")
+            exit(1)
+
         from rpc_proxy.config import init_config
         from rpc_proxy.ws import init_sockets
         from rpc_proxy.app import main
 
-        init_config()
+        init_config(args.config)
         init_sockets()
 
         main()

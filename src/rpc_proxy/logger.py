@@ -1,12 +1,9 @@
 import logging
 import os
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
-log_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'log'))
-log_path = os.path.join(log_dir, 'rpc-proxy.log')
-
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
+log_path = os.path.join(str(Path.home()), 'rpc-proxy.log')
 
 
 def create_logger(name, level=logging.INFO) -> logging.Logger:
