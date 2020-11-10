@@ -6,3 +6,4 @@ log/
 .sock
 env.sh
 config.json
+.egg-info

@@ -1,8 +1,0 @@
-README.md
-setup.py
-rpc_proxy.egg-info/PKG-INFO
-rpc_proxy.egg-info/SOURCES.txt
-rpc_proxy.egg-info/dependency_links.txt
-rpc_proxy.egg-info/entry_points.txt
-rpc_proxy.egg-info/requires.txt
-rpc_proxy.egg-info/top_level.txt

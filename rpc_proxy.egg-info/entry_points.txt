@@ -1,3 +1,0 @@
-[console_scripts]
-rpc_proxy = run:main
-
