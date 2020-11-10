@@ -31,8 +31,8 @@ def run_server():
     for item in {
         "HOST": "127.0.0.1",
         "PORT": 8080,
-        "DEBUG": False,
-        "WORKERS": 4
+        "WORKERS": 4,
+        "DEBUG": False
     }.items():
         [k, v] = item
 
