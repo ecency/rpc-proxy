@@ -13,12 +13,12 @@ setup(
     packages=find_packages(),
     install_requires=[
         'sanic',
-        'requests',
+        'websocket-client',
         'requests',
         'aiocache'
     ],
     entry_points={
         'console_scripts': [
-            'rpc_proxy=rpc_proxy.app:main'
+            'rpc_proxy=run:main'
         ]
     })

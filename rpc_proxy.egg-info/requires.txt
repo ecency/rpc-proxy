@@ -1,0 +1,4 @@
+sanic
+websocket-client
+requests
+aiocache
