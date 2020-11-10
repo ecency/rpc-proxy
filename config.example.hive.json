@@ -5,9 +5,15 @@
   },
   "timeouts": {
     "hived": 10,
-    "hivemind": 10
+    "hivemind": 6
   },
   "routes": {
+    "^bridge.get_account_posts$": {
+      "target": "hivemind"
+    },
+    "^condenser_api.(get_follow_count$|get_following|get_followers)$": {
+      "target": "hivemind"
+    },
     "^bridge.(.*)": {
       "target": "hivemind"
     },
@@ -18,16 +24,22 @@
       "target": "hived",
       "cache": 0
     },
-    "^condenser_api.(get_trending_tags|get_active_votes)$": {
+    "^condenser_api.(get_trending_tags|get_active_votes|get_content_replies|get_content)$": {
       "target": "hivemind"
     },
-    "^condenser_api.(get_dynamic_global_properties|get_feed_history|get_reward_fund|get_accounts|get_account_history|get_follow_count|get_followers)$": {
+    "^condenser_api.(get_dynamic_global_properties|get_feed_history|get_reward_fund|get_accounts|get_account_history)$": {
       "target": "hived",
       "cache": 0
     },
-    "^condenser_api.(lookup_accounts|get_vesting_delegations|get_hardfork_version|broadcast_transaction_synchronous|get_following)$": {
+    "^condenser_api.(lookup_accounts|get_vesting_delegations|get_hardfork_version|broadcast_transaction_synchronous)$": {
       "target": "hived",
       "cache": 0
+    },
+    "^condenser_api.(.*)$": {
+      "target": "hivemind"
+    },
+    "^rc_api.(.*)$": {
+      "target": "hived"
     }
   },
   "default-cache": 60
