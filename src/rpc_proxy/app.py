@@ -30,7 +30,7 @@ def run_server():
 
     for item in {
         "HOST": "127.0.0.1",
-        "PORT": 8080,
+        "PORT": 5002,
         "WORKERS": 4,
         "DEBUG": False
     }.items():

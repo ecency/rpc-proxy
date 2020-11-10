@@ -2,3 +2,4 @@ sanic
 websocket-client
 requests
 aiocache
+aioredis
