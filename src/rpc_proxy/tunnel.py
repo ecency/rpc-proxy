@@ -8,17 +8,10 @@ from sanic import response
 from rpc_proxy.cache import cache_get, cache_set
 from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigException
 from rpc_proxy.helper import route_match
+from rpc_proxy.logger import create_logger
 from rpc_proxy.regex import *
 from rpc_proxy.request import parse_request, RpcRequest
 from rpc_proxy.ws import get_socket
-from rpc_proxy.util import assert_env_vars
-from rpc_proxy.logger import create_logger
-
-try:
-    assert_env_vars("LOG_REQUESTS")
-    LOG_REQUESTS = True
-except AssertionError:
-    LOG_REQUESTS = False
 
 logger = create_logger("tunnel")
 
@@ -74,9 +67,6 @@ async def tunnel(data: Optional[Dict]):
     if request is None:
         return error_response({"error": "Not a valid json request"}, 406)
 
-    if LOG_REQUESTS:
-        logger.info(request.data)
-
     path = "{}.{}".format(request.api, request.method)
 
     route = route_match(config_get("routes"), path)
@@ -119,6 +109,9 @@ async def tunnel(data: Optional[Dict]):
         resp = fn(*(target, request, timeout))
     except BaseException as ex:
         return error_response({"error": str(ex)}, 500)
+
+    if "error" in resp:
+        logger.error("Query failed: {}".format(request.data))
 
     if "error" not in resp and cache_timeout > 0:
         await cache_set(cache_key, resp, cache_timeout)
