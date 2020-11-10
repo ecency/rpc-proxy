@@ -1,9 +1,8 @@
-import json
 from typing import Optional, Dict
 
 
 class RpcRequest:
-    def __init__(self, data: str, rpc_ver: str, api: str, method: str, params: dict, _id: str):
+    def __init__(self, data: Dict, rpc_ver: str, api: str, method: str, params: dict, _id: str):
         self.data = data
         self.rpc_ver = rpc_ver
         self.api = api
@@ -34,4 +33,4 @@ def parse_request(js_data: Optional[Dict]) -> Optional[RpcRequest]:
     else:
         [api, method] = raw_method.split(".")
 
-    return RpcRequest(json.dumps(js_data), rpc_ver, api, method, params, _id)
+    return RpcRequest(js_data, rpc_ver, api, method, params, _id)

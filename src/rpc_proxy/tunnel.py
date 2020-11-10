@@ -16,22 +16,23 @@ from rpc_proxy.ws import get_socket
 logger = create_logger("tunnel")
 
 
-async def http_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
-    resp = requests.post(url, request.data, timeout=timeout)
+async def http_tunnel(url: str, payload: str, timeout: int) -> Dict:
+    resp = requests.post(url, payload, timeout=timeout)
 
     return resp.json()
 
 
-async def ws_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
+async def ws_tunnel(url: str, payload: str, timeout: int) -> Dict:
     sock = await get_socket(url)
 
-    await sock.send(request.data)
+    await sock.send(payload)
+
     resp = await sock.recv()
 
     return json.loads(resp)
 
 
-async def sock_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
+async def sock_tunnel(url: str, payload: str, timeout: int) -> Dict:
     raise NotImplementedError
 
 
@@ -76,6 +77,12 @@ async def tunnel(data: Optional[Dict]):
 
     target_name = route_config["target"]
 
+    payload = json.dumps(request.data)
+
+    if "replace" in route_config:
+        [find, replace] = route_config["replace"].split("|")
+        payload = payload.replace(find, replace)
+
     try:
         target: str = config_get("targets", target_name)
     except NoSuchConfigException:
@@ -104,7 +111,7 @@ async def tunnel(data: Optional[Dict]):
         return error_response({"error": "Not a valid scheme: {}".format(target)}, 406)
 
     try:
-        resp = await fn(*(target, request, timeout))
+        resp = await fn(*(target, payload, timeout))
     except BaseException as ex:
         return error_response({"error": str(ex)}, 500)
 
