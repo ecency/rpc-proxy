@@ -61,6 +61,9 @@ def error_response(data: Dict, status: int):
 async def tunnel(data: Optional[Dict]):
     request = parse_request(data)
 
+    if request is None:
+        return error_response({"error": "Not a valid json request"}, 406)
+
     path = "{}.{}".format(request.api, request.method)
 
     route = route_match(config_get("routes"), path)
