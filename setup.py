@@ -13,6 +13,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'sanic',
+        'sanic_cors',
         'websocket-client',
         'requests',
         'aiocache',

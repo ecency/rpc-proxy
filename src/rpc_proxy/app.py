@@ -2,6 +2,7 @@ from typing import Optional
 
 from sanic import Sanic
 from sanic.request import Request
+from sanic_cors import CORS
 
 from rpc_proxy.logger import create_logger
 from rpc_proxy.tunnel import tunnel
@@ -15,7 +16,8 @@ logger = create_logger('proxy')
 def __app_setup():
     global app
 
-    app = Sanic()
+    app = Sanic(__name__)
+    CORS(app)
 
     @app.route("/", methods=["POST"])
     async def index(request: Request):
