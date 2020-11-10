@@ -111,7 +111,7 @@ async def tunnel(data: Optional[Dict]):
         return error_response({"error": str(ex)}, 500)
 
     if "error" in resp:
-        logger.error("Query failed: {}".format(request.data))
+        logger.error("Query failed: {} - {}".format(request.data, json.dumps(resp)))
 
     if "error" not in resp and cache_timeout > 0:
         await cache_set(cache_key, resp, cache_timeout)
