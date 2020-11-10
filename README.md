@@ -21,4 +21,4 @@ $ git clone https://github.com/ecency/rpc-proxy && cd rpc-proxy && pip3 install 
 |	     DEBUG     	|	  False         |
 
 
-*** redis server must be working at 127.0.0.1 ***
+**Redis server must be working at 127.0.0.1:6379**
