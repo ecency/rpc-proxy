@@ -1,7 +1,7 @@
 import re
 from typing import Dict, Optional
 
-from websocket import create_connection, WebSocket
+from websockets import connect, WebSocketClientProtocol
 
 from rpc_proxy.config import config_get, config_get_timeout
 from rpc_proxy.logger import create_logger
@@ -9,10 +9,10 @@ from rpc_proxy.regex import *
 
 logger = create_logger("ws")
 
-_ws: Optional[Dict[str, WebSocket]] = None
+_ws: Optional[Dict[str, WebSocketClientProtocol]] = None
 
 
-def init_sockets():
+async def init_sockets():
     global _ws
 
     _ws = {}
@@ -21,7 +21,7 @@ def init_sockets():
         address = targets[k]
         if re.match(WS_RE, address):
             try:
-                sock = create_connection(address, timeout=config_get_timeout(k))
+                sock = await connect(address, timeout=config_get_timeout(k))
             except BaseException as ex:
                 msg = "Web socket connection could not be created: {} - {}".format(address, str(ex))
                 logger.error(msg)
@@ -30,9 +30,9 @@ def init_sockets():
             _ws[address] = sock
 
 
-def get_socket(address: str) -> Optional[WebSocket]:
+async def get_socket(address: str) -> Optional[WebSocketClientProtocol]:
     if _ws is None:
-        init_sockets()
+        await init_sockets()
 
     if address in _ws:
         return _ws[address]

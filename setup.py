@@ -7,14 +7,14 @@ assert sys.version_info[0] == 3 and sys.version_info[1] >= 5, "rpc_proxy require
 
 setup(
     name='rpc_proxy',
-    version='0.0.3',
+    version='0.0.4',
     description='rpc proxy',
     long_description=open('README.md').read(),
     packages=find_packages(),
     install_requires=[
         'sanic',
         'sanic_cors',
-        'websocket-client',
+        'websockets',
         'requests',
         'aiocache',
         'aioredis'

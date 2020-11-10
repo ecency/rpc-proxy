@@ -16,24 +16,22 @@ from rpc_proxy.ws import get_socket
 logger = create_logger("tunnel")
 
 
-def http_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
+async def http_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
     resp = requests.post(url, request.data, timeout=timeout)
 
     return resp.json()
 
 
-def ws_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
-    sock = get_socket(url)
+async def ws_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
+    sock = await get_socket(url)
 
-    sock.settimeout(timeout)
-
-    sock.send(request.data)
-    resp = sock.recv()
+    await sock.send(request.data)
+    resp = await sock.recv()
 
     return json.loads(resp)
 
 
-def sock_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
+async def sock_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
     raise NotImplementedError
 
 
@@ -106,7 +104,7 @@ async def tunnel(data: Optional[Dict]):
         return error_response({"error": "Not a valid scheme: {}".format(target)}, 406)
 
     try:
-        resp = fn(*(target, request, timeout))
+        resp = await fn(*(target, request, timeout))
     except BaseException as ex:
         return error_response({"error": str(ex)}, 500)
 

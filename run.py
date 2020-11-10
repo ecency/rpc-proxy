@@ -31,11 +31,9 @@ def main():
             exit(1)
 
         from rpc_proxy.config import init_config
-        from rpc_proxy.ws import init_sockets
         from rpc_proxy.app import main
 
         init_config(args.config)
-        init_sockets()
 
         main()
 
