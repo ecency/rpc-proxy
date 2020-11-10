@@ -1,15 +1,15 @@
 import json
 import re
-from typing import Dict
+from typing import Dict, Optional
 
 import requests
-from flask import Response
+from sanic import response
 
-from rpc_proxy.cache import cache
+from rpc_proxy.cache import cache_get, cache_set
 from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigException
 from rpc_proxy.helper import route_match
 from rpc_proxy.regex import *
-from rpc_proxy.request import get_request, RpcRequest
+from rpc_proxy.request import parse_request, RpcRequest
 from rpc_proxy.ws import get_socket
 
 
@@ -34,32 +34,39 @@ def sock_tunnel(url: str, request: RpcRequest, timeout: int) -> Dict:
     raise NotImplementedError
 
 
-def make_response(data: str, from_cache: bool, source: str, path: str, route: str):
-    return Response(
-        response=data,
-        mimetype='application/json',
+def success_response(data: Dict, from_cache: bool, source: str, path: str, route: str):
+    return response.json(
+        data,
         headers={
             "rpc-proxy-from-cache": "1" if from_cache else "0",
             "rpc-proxy-data-source": source,
             "rpc-proxy-path": path,
             "rpc-proxy-route": route,
             "Access-Control-Expose-Headers": "*"
-        }
+        },
+        status=200
     )
 
 
-def tunnel():
-    request = get_request()
+def error_response(data: Dict, status: int):
+    return response.json(
+        data,
+        headers={
+            "Access-Control-Expose-Headers": "*"
+        },
+        status=status
+    )
 
-    if request is None:
-        return {"error": "Not a valid json request"}, 406
+
+async def tunnel(data: Optional[Dict]):
+    request = parse_request(data)
 
     path = "{}.{}".format(request.api, request.method)
 
     route = route_match(config_get("routes"), path)
 
     if route is None:
-        return {"error": "No route has matched: '{}'".format(path)}, 406
+        return error_response({"error": "No route has matched: '{}'".format(path)}, 406)
 
     route_config = config_get("routes", route)
 
@@ -68,7 +75,7 @@ def tunnel():
     try:
         target: str = config_get("targets", target_name)
     except NoSuchConfigException:
-        return {"error": "Not a valid target: {}".format(target_name)}, 406
+        return error_response({"error": "Not a valid target: {}".format(target_name)}, 406)
 
     cache_timeout: int = config_get("default-cache")
     if "cache" in route_config:
@@ -77,9 +84,9 @@ def tunnel():
     cache_key = "{}_{}".format(path, hash(str(request.params)))
 
     if cache_timeout > 0:
-        resp = cache.get(cache_key)
+        resp = await cache_get(cache_key)
         if resp is not None:
-            return make_response(json.dumps(resp), True, target_name, path, route)
+            return success_response(resp, True, target_name, path, route)
 
     timeout = config_get_timeout(target_name)
 
@@ -90,7 +97,7 @@ def tunnel():
     elif re.match(SOCK_RE, target):
         fn = sock_tunnel
     else:
-        return {"error": "Not a valid scheme: {}".format(target)}, 406
+        return error_response({"error": "Not a valid scheme: {}".format(target)}, 406)
 
     try:
         resp = fn(*(target, request, timeout))
@@ -98,6 +105,6 @@ def tunnel():
         return {"error": str(ex)}
 
     if "error" not in resp and cache_timeout > 0:
-        cache.set(cache_key, resp, timeout=cache_timeout)
+        await cache_set(cache_key, resp, cache_timeout)
 
-    return make_response(json.dumps(resp), False, target_name, path, route)
+    return success_response(resp, False, target_name, path, route)

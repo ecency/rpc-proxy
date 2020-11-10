@@ -1,45 +1,57 @@
-from flask import Flask
-from flask_cors import CORS
-from werkzeug.middleware.proxy_fix import ProxyFix
+from typing import Optional
+
+from sanic import Sanic
+from sanic.request import Request
 
 from rpc_proxy.logger import create_logger
 from rpc_proxy.tunnel import tunnel
 from rpc_proxy.util import assert_env_vars
 
-from rpc_proxy.cache import cache
+app = Optional[Sanic]
 
-app = None
-
-app_logger = create_logger('proxy')
+logger = create_logger('proxy')
 
 
-def __flask_setup():
+def __app_setup():
     global app
 
-    app = Flask(__name__)
-    app.wsgi_app = ProxyFix(app.wsgi_app)
-    app.logger = app_logger
-    CORS(app)
-    cache.init_app(app, config={
-        "CACHE_TYPE": "redis",
-        "CACHE_THRESHOLD": assert_env_vars("CACHE_THRESHOLD"),
-        "CACHE_REDIS_URL": assert_env_vars("CACHE_REDIS_URL")
-    })
+    app = Sanic()
 
     @app.route("/", methods=["POST"])
-    def index():
-        return tunnel()
+    async def index(request: Request):
+        return await tunnel(request.json)
 
 
-def __run_dev_server():
-    app.config['DEVELOPMENT'] = True
-    app.config['DEBUG'] = True
+def run_server():
+    args = {}
 
-    app.run(host='127.0.0.1', port=8089)
+    logger.info("Starting..")
+    logger.info("#" * 20)
+
+    for item in {
+        "HOST": "127.0.0.1",
+        "PORT": 8080,
+        "DEBUG": False,
+        "WORKERS": 4
+    }.items():
+        [k, v] = item
+
+        try:
+            val = type(v)(assert_env_vars(k))
+        except (AssertionError, ValueError):
+            val = v
+
+        args[k.lower()] = val
+
+        logger.info("{}: {}".format(k, val))
+
+    logger.info("#" * 20)
+
+    app.run(**args)
 
 
-__flask_setup()
+__app_setup()
 
 
 def main():
-    __run_dev_server()
+    run_server()

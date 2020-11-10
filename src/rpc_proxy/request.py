@@ -1,7 +1,5 @@
 import json
-from typing import Optional
-
-from flask import request
+from typing import Optional, Dict
 
 
 class RpcRequest:
@@ -19,16 +17,8 @@ class RpcRequest:
         )
 
 
-def get_request() -> Optional[RpcRequest]:
-    data = request.get_data().decode()
-
-    return parse_request(data)
-
-
-def parse_request(data: str) -> Optional[RpcRequest]:
-    try:
-        js_data = json.loads(data)
-    except json.decoder.JSONDecodeError:
+def parse_request(js_data: Optional[Dict]) -> Optional[RpcRequest]:
+    if js_data is None:
         return None
 
     if "jsonrpc" in js_data and "method" in js_data and "id" in js_data:
@@ -44,4 +34,4 @@ def parse_request(data: str) -> Optional[RpcRequest]:
     else:
         [api, method] = raw_method.split(".")
 
-    return RpcRequest(data, rpc_ver, api, method, params, _id)
+    return RpcRequest(json.dumps(js_data), rpc_ver, api, method, params, _id)
