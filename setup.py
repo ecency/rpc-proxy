@@ -15,7 +15,8 @@ setup(
         'sanic',
         'websocket-client',
         'requests',
-        'aiocache'
+        'aiocache',
+        'aioredis'
     ],
     entry_points={
         'console_scripts': [

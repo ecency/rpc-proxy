@@ -4,10 +4,12 @@ from aiocache import caches
 
 caches.set_config({
     'default': {
-        'cache': "aiocache.SimpleMemoryCache",
+        'cache': "aiocache.RedisCache",
+        'endpoint': "127.0.0.1",
+        'port': 6379,
         'serializer': {
-            'class': "aiocache.serializers.StringSerializer"
-        }
+            'class': "aiocache.serializers.PickleSerializer"
+        },
     }
 })
 
