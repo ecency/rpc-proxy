@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sanic import Sanic
+from sanic import Sanic, response
 from sanic.request import Request
 from sanic_cors import CORS
 
@@ -22,6 +22,10 @@ def __app_setup():
     @app.route("/", methods=["POST"])
     async def index(request: Request):
         return await tunnel(request.json)
+
+    @app.route("/", methods=["GET"])
+    async def index_get(request: Request):
+        return response.json({"Ecency": "Aspire to greatness"})
 
 
 def run_server():
