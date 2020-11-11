@@ -34,3 +34,23 @@ def parse_request(js_data: Optional[Dict]) -> Optional[RpcRequest]:
         [api, method] = raw_method.split(".")
 
     return RpcRequest(js_data, rpc_ver, api, method, params, _id)
+
+
+def translate_to_app_base(req: RpcRequest):
+    params = []
+
+    if isinstance(req.params, dict):
+        for item in req.params.items():
+            params.append(item[1])
+
+    if isinstance(req.params, list):
+        params = req.params
+
+    js_data = {
+        "id": req.id,
+        "jsonrpc": req.rpc_ver,
+        "method": "call",
+        "params": ["condenser_api", req.method, params]
+    }
+
+    return parse_request(js_data)

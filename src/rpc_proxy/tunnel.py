@@ -10,7 +10,7 @@ from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigExcepti
 from rpc_proxy.helper import route_match
 from rpc_proxy.logger import create_logger
 from rpc_proxy.regex import *
-from rpc_proxy.request import parse_request
+from rpc_proxy.request import parse_request, translate_to_app_base
 from rpc_proxy.util import assert_env_vars
 from rpc_proxy.ws import get_socket
 
@@ -82,13 +82,12 @@ async def tunnel(data: Optional[Dict]):
 
     route_config = config_get("routes", route)
 
+    if "translate_to_app_base" in route_config:
+        request = translate_to_app_base(request)
+
     target_name = route_config["target"]
 
     payload = json.dumps(request.data)
-
-    if "replace" in route_config:
-        [find, replace] = route_config["replace"].split("|")
-        payload = payload.replace(find, replace)
 
     try:
         target: str = config_get("targets", target_name)
