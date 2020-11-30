@@ -87,7 +87,7 @@ async def tunnel(data: Optional[Dict]):
 
     target_name = route_config["target"]
 
-    payload = json.dumps(request.data)
+    payload = json.dumps(request.data, ensure_ascii=False).encode('utf8')
 
     try:
         target: str = config_get("targets", target_name)

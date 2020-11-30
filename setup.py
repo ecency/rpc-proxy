@@ -7,7 +7,7 @@ assert sys.version_info[0] == 3 and sys.version_info[1] >= 5, "rpc_proxy require
 
 setup(
     name='rpc_proxy',
-    version='0.0.6',
+    version='0.0.7',
     description='rpc proxy',
     long_description=open('README.md').read(),
     packages=find_packages(),
