@@ -25,7 +25,7 @@ def __app_setup():
 
     @app.route("/", methods=["GET"])
     async def index_get(request: Request):
-        return response.json({"Ecency": "Aspire to greatness"})
+        return response.json({"Ecency": "Aspire to greatness", "jussi_num": -1, "status":"OK"})
 
 
 def run_server():
