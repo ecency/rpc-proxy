@@ -4,8 +4,8 @@
     "hivemind": "http://127.0.0.1:8080"
   },
   "timeouts": {
-    "hived": 10,
-    "hivemind": 10
+    "hived": 20,
+    "hivemind": 20
   },
   "routes": {
     "^bridge.(.*)": {
@@ -15,18 +15,22 @@
     "^database_api.(list_comments|find_comments|list_votes|find_votes)$": {
       "target": "hivemind"
     },
-    "^condenser_api.(get_follow_count$|get_following|get_followers|get_reblogged_by|get_account_reputations|get_content(.*)|get_trending_tags|get_active_votes|get_state|get_(.*)_by(.*)|get_blog(.*)|get_account_votes)$": {
+    "^condenser_api.(get_blog|get_follow_count$|get_following|get_followers|get_reblogged_by|get_account_reputations|get_content(.*)|get_trending_tags|get_active_votes|get_state|get_discussions_by(.*)|get_blog(.*)|get_account_votes)$": {
       "target": "hivemind"
     },
     "^database_api.(get_follow_count$|get_following|get_followers|get_reblogged_by|get_account_reputations|get_content(.*)|get_trending_tags|get_active_votes|get_state|get_(.*)_by(.*)|get_blog(.*)|get_account_votes)$": {
       "target": "hivemind",
       "translate_to_app_base": true
     },
-    "^database_api.(find_(.*)|lookup_accounts|get_vesting_delegations|broadcast_(.*)|get_transaction|find_accounts|get_hardfork_properties|get_nai_pool|get_current_price_feed)$": {
+    "^database_api.(list_proposals|find_(.*)|lookup_accounts|get_vesting_delegations|broadcast_(.*)|get_transaction|find_accounts|get_hardfork_properties|get_nai_pool|get_current_price_feed)$": {
       "target": "hived"
     },
-    "^condenser_api.(lookup_accounts|get_vesting_delegations|get_hardfork_version|broadcast_(.*)|get_transaction)$": {
+    "^condenser_api.(get_witness_by_account|get_witnesses_by_vote|lookup_accounts|get_vesting_delegations|get_hardfork_version|broadcast_(.*)|get_transaction)$": {
       "target": "hived"
+    },
+    "^condenser_api.(get_accounts)$": {
+      "target": "hived",
+      "cache": 10
     },
     "^condenser_api.(.*)$": {
       "target": "hived"
@@ -49,13 +53,32 @@
     "^rc_api.(.*)$": {
       "target": "hived"
     },
+    "^login_api.(.*)$": {
+      "target": "hived",
+      "translate_to_app_base": true
+    },
     "^network_broadcast_api.(.*)$": {
       "target": "hived",
       "translate_to_app_base": true
     },
+    "^market_history_api.(.*)$": {
+      "target": "hived"
+    },
     "^chain_api.(.*)$": {
       "target": "hived"
+    },
+    "^block_api.(.*)$": {
+      "target": "hived"
+    },
+    "^account_by_key_api.(.*)$": {
+      "target": "hived"
+    },
+    "^transaction_status_api.(.*)$": {
+      "target": "hived"
+    },
+    "^account_history_api.(.*)$": {
+      "target": "hived"
     }
-  },
+   },
   "default-cache": 0
 }
