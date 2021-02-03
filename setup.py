@@ -17,8 +17,7 @@ setup(
         'websockets',
         'requests',
         'aiocache',
-        'aioredis',
-        'hashlib'
+        'aioredis'
     ],
     entry_points={
         'console_scripts': [

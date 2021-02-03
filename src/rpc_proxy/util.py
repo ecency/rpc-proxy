@@ -1,5 +1,10 @@
+import hashlib
 import os
 from typing import Any, Union
+
+
+def md5(s):
+    return hashlib.md5(s.encode('utf-8')).hexdigest()
 
 
 def file_write(path: str, data: Any, mode: str = 'w'):
