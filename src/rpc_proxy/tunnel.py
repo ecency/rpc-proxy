@@ -1,13 +1,14 @@
 import json
 import re
-from typing import Dict, Optional
+from typing import Dict
 
 import requests
 from sanic import response
+from sanic.request import Request
 
 from rpc_proxy.cache import cache_get, cache_set
 from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigException
-from rpc_proxy.helper import route_match
+from rpc_proxy.helper import route_match, gen_etag
 from rpc_proxy.logger import create_logger
 from rpc_proxy.regex import *
 from rpc_proxy.request import parse_request, translate_to_app_base
@@ -23,35 +24,36 @@ except AssertionError:
     LOG_ERRORS = False
 
 
-async def http_tunnel(url: str, payload: str, timeout: int) -> Dict:
+async def http_tunnel(url: str, payload: str, timeout: int) -> str:
     resp = requests.post(url, payload, timeout=timeout)
 
-    return resp.json()
+    return resp.text
 
 
-async def ws_tunnel(url: str, payload: str, timeout: int) -> Dict:
+async def ws_tunnel(url: str, payload: str, timeout: int) -> str:
     sock = await get_socket(url)
 
     await sock.send(payload)
 
     resp = await sock.recv()
 
-    return json.loads(resp)
+    return resp
 
 
-async def sock_tunnel(url: str, payload: str, timeout: int) -> Dict:
+async def sock_tunnel(url: str, payload: str, timeout: int) -> str:
     raise NotImplementedError
 
 
-def success_response(data: Dict, from_cache: bool, source: str, path: str, route: str):
+def success_response(data: str, from_cache: bool, source: str, path: str, route: str):
     return response.json(
-        data,
+        json.loads(data),
         headers={
             "rpc-proxy-from-cache": "1" if from_cache else "0",
             "rpc-proxy-data-source": source,
             "rpc-proxy-path": path,
             "rpc-proxy-route": route,
-            "Access-Control-Expose-Headers": "*"
+            "Access-Control-Expose-Headers": "*",
+            "ETag": gen_etag(data)
         },
         status=200
     )
@@ -67,8 +69,15 @@ def error_response(data: Dict, status: int):
     )
 
 
-async def tunnel(data: Optional[Dict]):
-    request = parse_request(data)
+def should_send_304(request: Request, resp_body: str):
+    if "http_if_none_match" in request.headers and gen_etag(resp_body) in request.headers["http_if_none_match"]:
+        return True
+
+    return False
+
+
+async def tunnel(http_request: Request):
+    request = parse_request(http_request.json)
 
     if request is None:
         return error_response({"error": "Not a valid json request"}, 406)
@@ -102,7 +111,11 @@ async def tunnel(data: Optional[Dict]):
 
     if cache_timeout > 0:
         resp = await cache_get(cache_key)
+
         if resp is not None:
+            if should_send_304(http_request, resp):
+                return response.raw("", status=304)
+
             return success_response(resp, True, target_name, path, route)
 
     timeout = config_get_timeout(target_name)
@@ -126,5 +139,8 @@ async def tunnel(data: Optional[Dict]):
 
     if "error" not in resp and cache_timeout > 0:
         await cache_set(cache_key, resp, cache_timeout)
+
+    if should_send_304(http_request, resp):
+        return response.raw("", status=304)
 
     return success_response(resp, False, target_name, path, route)

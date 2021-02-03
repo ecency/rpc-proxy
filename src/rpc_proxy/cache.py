@@ -1,5 +1,3 @@
-from typing import Any
-
 from aiocache import caches
 
 caches.set_config({
@@ -19,6 +17,6 @@ async def cache_get(key: str):
     return await cache.get(key)
 
 
-async def cache_set(key: str, value: Any, ttl: int):
+async def cache_set(key: str, value: str, ttl: int):
     cache = caches.get('default')
     await cache.set(key, value, ttl)
