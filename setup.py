@@ -7,7 +7,7 @@ assert sys.version_info[0] == 3 and sys.version_info[1] >= 6, "rpc_proxy require
 
 setup(
     name='rpc_proxy',
-    version='0.0.7',
+    version='0.0.8',
     description='rpc proxy',
     long_description=open('README.md').read(),
     packages=find_packages(),
@@ -17,7 +17,8 @@ setup(
         'websockets',
         'requests',
         'aiocache',
-        'aioredis'
+        'aioredis',
+        'hashlib'
     ],
     entry_points={
         'console_scripts': [

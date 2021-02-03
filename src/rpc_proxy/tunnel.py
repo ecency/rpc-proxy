@@ -7,7 +7,7 @@ from sanic import response
 
 from rpc_proxy.cache import cache_get, cache_set
 from rpc_proxy.config import config_get, config_get_timeout, NoSuchConfigException
-from rpc_proxy.helper import route_match
+from rpc_proxy.helper import route_match, gen_etag
 from rpc_proxy.logger import create_logger
 from rpc_proxy.regex import *
 from rpc_proxy.request import parse_request, translate_to_app_base
@@ -51,7 +51,8 @@ def success_response(data: Dict, from_cache: bool, source: str, path: str, route
             "rpc-proxy-data-source": source,
             "rpc-proxy-path": path,
             "rpc-proxy-route": route,
-            "Access-Control-Expose-Headers": "*"
+            "Access-Control-Expose-Headers": "*",
+            "ETag": gen_etag(data)
         },
         status=200
     )
