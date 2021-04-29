@@ -17,7 +17,10 @@ setup(
         'websockets',
         'requests',
         'aiocache',
-        'aioredis'
+        'aioredis',
+        'SQLAlchemy',
+        'psycopg2-binary',
+        'asyncpg'
     ],
     entry_points={
         'console_scripts': [

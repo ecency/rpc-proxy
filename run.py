@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description='')
     cmd_list = (
         "proxy",
+        "create_cache",
         "test"
     )
 
@@ -36,6 +37,10 @@ def main():
         init_config(args.config)
 
         main()
+
+    if cmd == "create_cache":
+        from rpc_proxy.cache import create_cache
+        create_cache()
 
     if cmd == "test":
         from rpc_proxy.tests import do_tests
