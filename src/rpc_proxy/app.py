@@ -21,7 +21,7 @@ def __app_setup():
 
     @app.route("/", methods=["POST"])
     async def index(request: Request):
-        return await tunnel(request.json)
+        return await tunnel(request)
 
     @app.route("/", methods=["GET"])
     async def index_get(request: Request):
