@@ -4,13 +4,13 @@
     "hivemind": "http://127.0.0.1:8080"
   },
   "timeouts": {
-    "hived": 20,
-    "hivemind": 20
+    "hived": 10,
+    "hivemind": 10
   },
   "routes": {
     "^bridge.(.*)": {
       "target": "hivemind",
-      "cache": 20
+      "cache": 5
     },
     "^database_api.(list_comments|find_comments|list_votes|find_votes)$": {
       "target": "hivemind"
@@ -25,12 +25,15 @@
     "^database_api.(list_proposals|find_(.*)|lookup_accounts|get_vesting_delegations|broadcast_(.*)|get_transaction|find_accounts|get_hardfork_properties|get_nai_pool|get_current_price_feed)$": {
       "target": "hived"
     },
+    "^database_api.(list_proposal_votes)$": {
+      "target": "hived"
+    },
     "^condenser_api.(get_witness_by_account|get_witnesses_by_vote|lookup_accounts|get_vesting_delegations|get_hardfork_version|broadcast_(.*)|get_transaction)$": {
       "target": "hived"
     },
     "^condenser_api.(get_accounts)$": {
       "target": "hived",
-      "cache": 10
+      "cache": 5
     },
     "^condenser_api.(.*)$": {
       "target": "hived"
