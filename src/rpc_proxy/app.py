@@ -17,7 +17,7 @@ def __app_setup():
     global app
 
     app = Sanic(__name__)
-    CORS(app)
+    CORS(app, automatic_options=True)
 
     @app.route("/", methods=["POST"])
     async def index(request: Request):
